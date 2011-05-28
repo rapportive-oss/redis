@@ -73,7 +73,8 @@ robj *lookupKeyWriteOrReply(redisClient *c, robj *key, robj *reply) {
 int dbAdd(redisDb *db, robj *key, robj *val) {
     /* Perform a lookup before adding the key, as we need to copy the
      * key value. */
-    if (dictFind(db->dict, key->ptr) != NULL) {
+    if (dictFind(db->dict, key->ptr) != NULL &&
+            !expireIfNeeded(db, key)) {
         return REDIS_ERR;
     } else {
         sds copy = sdsdup(key->ptr);
